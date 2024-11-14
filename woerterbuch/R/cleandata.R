@@ -27,15 +27,15 @@ process_findings <- function(relevant_documents) {
     )) %>%
     select(-L2)
 
-  # Umwandlung in breites Format
+  # Umwandlung in breites Format und Sicherstellung eindeutiger Werte
   result <- findings %>%
-    pivot_wider(names_from = "L1", values_from = "value") %>%
-    unnest(cols = where(is.list), names_repair = "unique") # Entpacke alle Listen
+    pivot_wider(names_from = "L1", values_from = "value", values_fn = list(value = list)) %>%
+    unnest(cols = where(is.list), names_repair = "unique") # Entpacke alle Listen, falls vorhanden
 
   # Zusammenfassen der Treffer pro Dokument und OR-Gruppe
   result <- result %>%
     group_by(doc_id, document) %>%
-    summarize(across(starts_with("found_words_"), ~ paste(na.omit(.), collapse = ", ")), .groups = "drop") %>%
+    summarize(across(starts_with("found_words_"), ~ paste(na.omit(unlist(.)), collapse = ", ")), .groups = "drop") %>%
     ungroup()
 
   return(result)
