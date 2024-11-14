@@ -13,6 +13,6 @@ process_findings(relevant_documents)
 Ein DataFrame mit den formatierten Ergebnissen.
 }
 \description{
-Diese Funktion verarbeitet die relevanten Dokumente und formatiert die Ergebnisse in einem
-Datensatz, der mehrfach Treffer pro Dokument berücksichtigt und in ein breites Format bringt.
+Diese Funktion verarbeitet die Suchergebnisse (relevant_documents) und formatiert sie in einen
+Datensatz, der Mehrfach-Treffer pro Dokument berücksichtigt und in ein breites Format bringt.
 }
