@@ -21,26 +21,39 @@ process_findings <- function(relevant_documents) {
     mutate(L1 = ifelse(L2 == "document", L1, paste0(L1, "_", L2))) %>%
     select(-L2)
 
-  # Umwandlung in breites Format
-  # Verwenden von values_fn, um Listenspalten zu vermeiden und Mehrfachwerte zu aggregieren
+  # Umwandlung in breites Format und Aggregation von Listeneinträgen
   results <- findings_df %>%
     pivot_wider(names_from = "L1", values_from = "value", values_fn = list(value = list)) %>%
     mutate(across(starts_with("found_words"), ~ sapply(.x, function(x) paste0(unlist(x), collapse = ", "))))
 
-  # Dokument- und Wort-Spalten zusammenfassen
-  if ("document" %in% names(results)) {
+  # Zusammenführen der Ergebnisse nach Verfügbarkeit von `doc_id` und `document`
+  if ("doc_id" %in% names(results) && "document" %in% names(results)) {
+    # Fall: Beide Spalten sind vorhanden
     results <- results %>%
       unnest(cols = c(document, doc_id)) %>%
       group_by(doc_id, document) %>%
       summarize(across(starts_with("found_words"), ~ paste0(.x, collapse = ", "))) %>%
       ungroup()
-  } else {
+  } else if ("doc_id" %in% names(results)) {
+    # Fall: Nur `doc_id` ist vorhanden
     results <- results %>%
       unnest(cols = doc_id) %>%
       group_by(doc_id) %>%
       summarize(across(starts_with("found_words"), ~ paste0(.x, collapse = ", "))) %>%
       ungroup()
+  } else if ("document" %in% names(results)) {
+    # Fall: Nur `document` ist vorhanden
+    results <- results %>%
+      unnest(cols = document) %>%
+      group_by(document) %>%
+      summarize(across(starts_with("found_words"), ~ paste0(.x, collapse = ", "))) %>%
+      ungroup()
+  } else {
+    # Fall: Keine `doc_id` oder `document` Spalte vorhanden, nur die gefundenen Wörter zusammenführen
+    results <- results %>%
+      summarize(across(starts_with("found_words"), ~ paste0(.x, collapse = ", ")))
   }
 
   return(results)
 }
+
