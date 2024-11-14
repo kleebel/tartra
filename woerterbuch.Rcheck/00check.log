@@ -1,0 +1,85 @@
+* using log directory 'C:/Users/kleefeld/Documents/GitHub/TarTra/woerterbuch.Rcheck'
+* using R version 4.2.3 (2023-03-15 ucrt)
+* using platform: x86_64-w64-mingw32 (64-bit)
+* using session charset: UTF-8
+* using options '--no-manual --as-cran'
+* checking for file 'woerterbuch/DESCRIPTION' ... OK
+* this is package 'woerterbuch' version '0.0.0.9000'
+* package encoding: UTF-8
+* checking package namespace information ... OK
+* checking package dependencies ... OK
+* checking if this is a source package ... OK
+* checking if there is a namespace ... OK
+* checking for .dll and .exe files ... OK
+* checking for hidden files and directories ... OK
+* checking for portable file names ... OK
+* checking whether package 'woerterbuch' can be installed ... OK
+* checking package directory ... OK
+* checking for future file timestamps ... NOTE
+unable to verify current time
+* checking DESCRIPTION meta-information ... NOTE
+Lizenzkomponenten, die Templates sind und '+ file LICENCE' benötigen:
+  MIT
+* checking top-level files ... OK
+* checking for left-over files ... OK
+* checking index information ... OK
+* checking package subdirectories ... OK
+* checking R files for non-ASCII characters ... OK
+* checking R files for syntax errors ... OK
+* checking whether the package can be loaded ... OK
+* checking whether the package can be loaded with stated dependencies ... OK
+* checking whether the package can be unloaded cleanly ... OK
+* checking whether the namespace can be loaded with stated dependencies ... OK
+* checking whether the namespace can be unloaded cleanly ... OK
+* checking loading without being on the library search path ... OK
+* checking dependencies in R code ... OK
+* checking S3 generic/method consistency ... OK
+* checking replacement functions ... OK
+* checking foreign function calls ... OK
+* checking R code for possible problems ... NOTE
+apply_term_search: no visible global function definition for
+  'makeCluster'
+apply_term_search: no visible global function definition for
+  'detectCores'
+apply_term_search: no visible binding for global variable 'doc_id'
+apply_term_search: no visible binding for global variable
+  'oder_und_oder'
+apply_term_search: no visible global function definition for
+  'stopCluster'
+process_findings: no visible binding for global variable 'L1'
+process_findings: no visible binding for global variable 'L2'
+process_findings: no visible binding for global variable 'value'
+process_findings: no visible binding for global variable 'group'
+process_findings: no visible binding for global variable
+  'found_words_OR1'
+process_findings: no visible binding for global variable
+  'found_words_OR2'
+process_findings: no visible binding for global variable 'document'
+process_findings: no visible binding for global variable 'doc_id'
+Undefined global functions or variables:
+  L1 L2 detectCores doc_id document found_words_OR1 found_words_OR2
+  group makeCluster oder_und_oder stopCluster value
+* checking Rd files ... OK
+* checking Rd metadata ... OK
+* checking Rd line widths ... OK
+* checking Rd cross-references ... OK
+* checking for missing documentation entries ... OK
+* checking for code/documentation mismatches ... OK
+* checking Rd \usage sections ... WARNING
+Undokumentierte Argumente im Dokumentations-Objekt 'generate_conditions'
+  'or_group'
+Dokumentierte Objekte kommen in \usage des Dokuobjekts 'generate_conditions' nicht vor
+  'search_or_group'
+
+Functions with \usage entries need to have the appropriate \alias
+entries, and all their arguments documented.
+The \usage entries must correspond to syntactically valid R code.
+See chapter 'Writing R documentation files' in the 'Writing R
+Extensions' manual.
+* checking Rd contents ... OK
+* checking for unstated dependencies in examples ... OK
+* checking examples ... NONE
+* checking for non-standard things in the check directory ... OK
+* checking for detritus in the temp directory ... OK
+* DONE
+Status: 1 WARNING, 3 NOTEs

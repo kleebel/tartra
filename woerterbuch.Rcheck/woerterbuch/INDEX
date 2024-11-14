@@ -1,0 +1,4 @@
+apply_term_search       Apply Term Search Across Multiple Documents
+                        (Parallel)
+generate_conditions     Generate Search Conditions
+process_findings        Process Findings and Transform into Dataset

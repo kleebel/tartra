@@ -1,0 +1,21 @@
+Package: woerterbuch
+Title: Filteranalyse für Dokumentenkorpora
+Version: 0.0.0.9000
+Authors@R: 
+    person("Isabel", "Kleefeld", , "isabel.kleefel@tu-berlin.de", role = c("aut", "cre"),
+           comment = c(ORCID = "0009-0003-4644-4387"))
+Description: Dieses Package bietet Funktionen zur Verarbeitung und Analyse 
+             von Dokumentenkorpora, um relevante Begriffskombinationen basierend 
+             auf vordefinierten Filterbedingungen zu identifizieren.
+Depends: R (>= 4.0.0)
+License: MIT
+Encoding: UTF-8
+Imports: stringr, dplyr, tidyr, rrapply, foreach, doParallel
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.1
+Suggests: testthat (>= 3.0.0), knitr, kableExtra, roxygen2, purrr
+VignetteBuilder: knitr
+NeedsCompilation: no
+Packaged: 2024-11-14 11:48:44 UTC; kleefeld
+Author: Isabel Kleefeld [aut, cre] (<https://orcid.org/0009-0003-4644-4387>)
+Maintainer: Isabel Kleefeld <isabel.kleefel@tu-berlin.de>
