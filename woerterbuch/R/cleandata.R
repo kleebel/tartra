@@ -30,7 +30,7 @@ process_findings <- function(relevant_documents) {
   # Umwandlung in breites Format und Sicherstellung eindeutiger Werte
   result <- findings %>%
     pivot_wider(names_from = "L1", values_from = "value", values_fn = list(value = list)) %>%
-    unnest(cols = where(is.list), names_repair = "unique") # Entpacke alle Listen, falls vorhanden
+    unnest_longer(cols = where(is.list), names_repair = "unique") # Entpacke alle Listen, falls vorhanden
 
   # Zusammenfassen der Treffer pro Dokument und OR-Gruppe
   result <- result %>%
