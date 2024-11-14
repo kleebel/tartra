@@ -11,37 +11,28 @@
 #' @return Ein DataFrame mit den formatierten Ergebnissen.
 #' @export
 process_findings <- function(relevant_documents) {
+  # Ergebnisse in Datenrahmen-Format bringen
+  findings_df <- rrapply(relevant_documents, how = "melt")
 
-  # 1. Melt die relevanten Dokumente, um eine flache Struktur zu erzeugen
-  findings <- rrapply(relevant_documents, how = "melt")
+  # Gruppen für mehrfach Treffer pro Dokument identifizieren
+  findings_df$group <- cumsum(findings_df$L1 == "doc_id")
 
-  # 2. Identifiziere Gruppen für mehrfach Treffer pro Dokument (z.B. mehrere relevante Begriffe pro Dokument)
-  findings$group <- cumsum(findings$L1 == "doc_id")
-
-  # 3. Auswahl der relevanten Spalten und Hinzufügen von Suffixen zur Unterscheidung der Suchgruppen
-  df <- findings %>%
+  # Dynamische Zuordnung der Spaltennamen
+  findings_df <- findings_df %>%
     select(L1, L2, value, group) %>%
-    mutate(L1 = case_when(
-      L2 == "OR1" ~ paste0(L1, "_OR1"),  # Qualifizierung-Begriffe
-      L2 == "OR2" ~ paste0(L1, "_OR2"),   # Digitalisierung-Begriffe
-      TRUE ~ L1
-    )) %>%
+    mutate(L1 = ifelse(L2 == "document", L1, paste0(L1, "_", L2))) %>%
     select(-L2)
 
-  # 4. Umwandlung in breites Format und Entpacken von Listen
-  result <- df %>%
+  # Umwandlung in breites Format und Entpacken von Listen
+  results <- findings_df %>%
     pivot_wider(names_from = "L1", values_from = "value") %>%
-    unnest(cols = c(found_words_OR1, found_words_OR2, document, doc_id))
+    unnest(cols = c(any_of(names(findings_df)[grepl("^found_words_", names(findings_df))]), "document", "doc_id"))
 
-  # 5. Zusammenfassen der Wörter pro Seite
-  result <- result %>%
+  # Zusammenfassen der Wörter pro Dokument (dynamisch alle gefundenen Gruppen zusammenführen)
+  results <- results %>%
     group_by(doc_id, document) %>%
-    summarize(
-      found_words_OR1 = paste0(found_words_OR1, collapse = ", "),
-      found_words_OR2 = paste0(found_words_OR2, collapse = ", ")
-    ) %>%
-    ungroup()  # Entferne die Gruppierung
+    summarize(across(starts_with("found_words"), ~ paste0(.x, collapse = ", "))) %>%
+    ungroup()
 
-  # Rückgabe des formatierten DataFrames
-  return(result)
+  return(results)
 }
