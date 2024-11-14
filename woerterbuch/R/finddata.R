@@ -44,9 +44,7 @@ apply_term_search <- function(corpus, conditions) {
 #' @rdname apply_term_search
 #' @import stringr
 #' @import dplyr
-#' @param doc Ein Dokument (Zeichenkette), das durchsucht werden soll.
-#' @param conditions Eine Liste von Bedingungen mit AND-OR-Kombinationen.
-#' @return Eine Liste der gefundenen Begriffe, die den Bedingungen entsprechen.
+#' @export
 find_terms <- function(doc, conditions) {
   found_words <- list()
 
