@@ -3,24 +3,25 @@
 \name{apply_term_search}
 \alias{apply_term_search}
 \alias{find_terms}
-\title{Apply Term Search Across Multiple Documents (Parallel)}
+\title{Apply Complex Term Search Across Multiple Documents with Dynamic Conditions}
 \usage{
-apply_term_search(corpus)
+apply_term_search(corpus, conditions)
 
 find_terms(doc, conditions)
 }
 \arguments{
 \item{corpus}{Ein Korpus von Dokumenten (Liste von Zeichenketten).}
 
-\item{doc}{Ein Dokument (Zeichenkette), das durchsucht werden soll.}
-
 \item{conditions}{Eine Liste von Bedingungen mit AND-OR-Kombinationen.}
+
+\item{doc}{Ein Dokument (Zeichenkette), das durchsucht werden soll.}
 }
 \value{
 Eine Liste der relevanten Dokumente mit den gefundenen Begriffen.
 
-Eine Liste der gefundenen Begriffe, die den Bedingungen entsprechen.
+Eine Liste der gefundenen Wörter, die die Bedingungen erfüllen.
 }
 \description{
-Diese Funktion durchsucht mehrere Dokumente parallel nach Begriffen gemäß den Bedingungen.
+Diese Funktion durchsucht mehrere Dokumente nach Begriffen basierend auf den dynamisch generierten Bedingungen.
+Der Benutzer kann angeben, welche OR-Gruppen innerhalb einer AND-Bedingung er suchen möchte.
 }

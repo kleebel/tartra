@@ -5,6 +5,8 @@
 #' Diese Funktion durchsucht mehrere Dokumente nach Begriffen basierend auf den dynamisch generierten Bedingungen.
 #' Der Benutzer kann angeben, welche OR-Gruppen innerhalb einer AND-Bedingung er suchen möchte.
 #'
+#' @import foreach
+#' @import doParallel
 #' @param corpus Ein Korpus von Dokumenten (Liste von Zeichenketten).
 #' @param conditions Eine Liste von Bedingungen, die durch generate_conditions erzeugt wurde.
 #' @return Eine Liste der relevanten Dokumente mit den gefundenen Begriffen.
@@ -44,6 +46,9 @@ apply_term_search <- function(corpus, conditions) {
 #' @rdname apply_term_search
 #' @import stringr
 #' @import dplyr
+#' @param doc Ein Dokument (Zeichenkette), das durchsucht werden soll.
+#' @param conditions Eine Liste von Bedingungen mit AND-OR-Kombinationen.
+#' @return Eine Liste der gefundenen Wörter, die die Bedingungen erfüllen.
 #' @export
 find_terms <- function(doc, conditions) {
   found_words <- list()

@@ -9,7 +9,7 @@ generate_conditions(and_conditions, or_group = NULL)
 \arguments{
 \item{and_conditions}{Ein Vektor mit AND-Bedingungen, jede AND-Bedingung enthält OR-Gruppen.}
 
-\item{search_or_group}{(Optional) Eine spezifische OR-Gruppe, die gesucht werden soll.}
+\item{or_group}{(Optional) Eine spezifische OR-Gruppe, die gesucht werden soll.}
 }
 \value{
 Eine Liste von Bedingungen, die in apply_term_search verwendet werden können.
