@@ -11,7 +11,7 @@
 #' @export
 moreor_apply_search <- function(corpus, conditions) {
   # Erstelle einen Parallel-Cluster
-  cl <- makeCluster(detectCores())
+  cl <- parallel:makeCluster(detectCores())
   registerDoParallel(cl)
 
   # Parallele Verarbeitung der Dokumente
