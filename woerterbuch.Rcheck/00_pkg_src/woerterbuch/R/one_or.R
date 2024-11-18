@@ -6,7 +6,7 @@
 #' @import foreach
 #' @import doParallel
 #' @param corpus Ein Korpus von Dokumenten (Liste von Zeichenketten).
-#' @param conditions Eine Bedingung (Liste) mit einer einzigen OR-Gruppe.
+#' @param condition Eine Bedingung (Liste) mit einer einzigen OR-Gruppe.
 #' @return Eine Liste der relevanten Dokumente mit den gefundenen Begriffen.
 #' @export
 oneor_apply_search <- function(corpus, conditions) {
