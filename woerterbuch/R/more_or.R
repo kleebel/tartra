@@ -9,7 +9,7 @@
 #' @param conditions Eine Liste von Bedingungen.
 #' @return Eine Liste der relevanten Dokumente mit den gefundenen Begriffen.
 #' @export
-moreor_apply_search <- function(corpus) {
+moreor_apply_search <- function(corpus, conditions) {
   # Erstelle einen Parallel-Cluster
   cl <- makeCluster(detectCores())
   registerDoParallel(cl)
@@ -19,7 +19,7 @@ moreor_apply_search <- function(corpus) {
     doc_id = names(corpus), .combine = "c", .packages = c("stringr", "foreach", "doParallel")
   ) %dopar% {
     doc <- corpus[[doc_id]]
-    found_words <- find_terms(doc, conditions)
+    found_words <- moreor_term_search(doc, conditions)
 
     # Wenn relevante Begriffe gefunden wurden, speichere sie
     if (length(found_words) > 0) {
