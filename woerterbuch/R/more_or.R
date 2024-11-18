@@ -100,7 +100,7 @@ moreor_process_findings <- function(relevant_documents) {
   # 3. Auswahl der relevanten Spalten und Hinzufügen von Suffixen zur Unterscheidung der Suchgruppen
   df <- findings %>%
     select(L1, L2, value, group) %>%
-    mutate(L1 = paste0(L1, "_", L2)) %>%
+    mutate(L1 = ifelse(is.na(L2), L1, paste0(L1, "_", L2))) %>%
     select(-L2)
 
   # 4. Umwandlung in breites Format und Entpacken von Listen
