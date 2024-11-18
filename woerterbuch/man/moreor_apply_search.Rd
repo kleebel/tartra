@@ -5,16 +5,16 @@
 \alias{moreor_term_search}
 \title{Search multiple OR-Groups Across Multiple Documents (Parallel)}
 \usage{
-moreor_apply_search(corpus)
+moreor_apply_search(corpus, conditions)
 
 moreor_term_search(doc, conditions)
 }
 \arguments{
 \item{corpus}{Ein Korpus von Dokumenten (Liste von Zeichenketten).}
 
-\item{doc}{Ein Dokument (Zeichenkette), das durchsucht werden soll.}
-
 \item{conditions}{Eine Liste von Bedingungen mit AND-OR-Kombinationen.}
+
+\item{doc}{Ein Dokument (Zeichenkette), das durchsucht werden soll.}
 }
 \value{
 Eine Liste der relevanten Dokumente mit den gefundenen Begriffen.

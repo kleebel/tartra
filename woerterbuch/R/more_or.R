@@ -11,9 +11,7 @@
 #' @export
 moreor_apply_search <- function(corpus, conditions) {
   # Erstelle einen Parallel-Cluster
-  library(parallel)  # Stelle sicher, dass das Paket geladen ist
-  library(doParallel)
-  cl <- parallel:makeCluster(detectCores())
+  cl <- makeCluster(detectCores())
   registerDoParallel(cl)
 
   # Parallele Verarbeitung der Dokumente

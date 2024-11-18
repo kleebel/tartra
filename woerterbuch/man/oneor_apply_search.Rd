@@ -15,8 +15,6 @@ oneor_term_search(doc, conditions)
 \item{conditions}{Eine Bedingung (Liste) mit einer einzigen OR-Gruppe.}
 
 \item{doc}{Ein Dokument (Zeichenkette), das durchsucht werden soll.}
-
-\item{condition}{Eine Bedingung (Liste) mit einer einzigen OR-Gruppe.}
 }
 \value{
 Eine Liste der relevanten Dokumente mit den gefundenen Begriffen.

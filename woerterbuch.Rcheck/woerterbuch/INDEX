@@ -1,8 +1,0 @@
-moreor_apply_search     Search multiple OR-Groups Across Multiple
-                        Documents (Parallel)
-moreor_process_findings
-                        Process Findings of multiple OR-Groups
-oneor_apply_search      Search one OR-Term Across Multiple Documents
-                        (Parallel)
-oneor_process_findings
-                        Process Findings of a single OR-Group
