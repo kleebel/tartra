@@ -47,7 +47,7 @@ oneor_apply_search <- function(corpus, conditions) {
 #' @return Eine Liste der gefundenen Woerter, die die Bedingung erfuellen.
 #' @export
 oneor_term_search <- function(doc, conditions) {
-  if (!is.list(condition) || !"OR" %in% names(conditions)) {
+  if (!is.list(conditions) || !"OR" %in% names(conditions)) {
     stop("Condition muss eine Liste mit einem OR-Schluessel sein.")
   }
 
