@@ -75,21 +75,21 @@ oneor_term_search <- function(doc, conditions) {
 #' @return Ein DataFrame mit den formatierten Ergebnissen.
 #' @export
 oneor_process_findings <- function(relevant_documents) {
+  # 1. Extrahiere Daten und füge Gruppen-Identifikation hinzu
+  findings <- rrapply(relevant_documents, how = "melt") %>%
+    mutate(group = cumsum(L1 == "doc_id"))
 
-  # Ueberpruefe, ob relevante Dokumente vorhanden sind
-  if (length(relevant_documents) == 0) {
-    return(data.frame(doc_id = character(0), document = character(0), found_words = character(0)))
-  }
+  # 2. Umwandlung in breites Format und Entpacken von Listen
+  result <- findings %>%
+    pivot_wider(names_from = "L1", values_from = "value", values_fn = list) %>%
+    unnest(cols = found_words) %>%
+    unnest(cols = found_words)
 
-  # Extrahiere die Daten in eine flache Struktur
-  results <- do.call(rbind, lapply(relevant_documents, function(doc) {
-    data.frame(
-      doc_id = doc$doc_id,
-      document = doc$document,
-      found_words = paste(doc$found_words, collapse = ", ")
-    )
-  }))
+  # 3. Zusammenfassen der Wörter pro Dokument und Entpacken von Listen
+  result <- result %>%
+    group_by(doc_id, document) %>%
+    summarize(found_words = paste(found_words, collapse = ", "), .groups = "drop") %>%
+    unnest(cols = c(doc_id, document))
 
-  # Rueckgabe als DataFrame
-  return(results)
+  return(result)
 }
