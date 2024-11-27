@@ -89,6 +89,7 @@ oneor_process_findings <- function(relevant_documents) {
   result <- result %>%
     group_by(doc_id, document) %>%
     summarize(found_words = paste(found_words, collapse = ", "), .groups = "drop") %>%
+    unnest(cols = c(doc_id, document)) %>%
     unnest(cols = c(doc_id, document))
 
   return(result)
