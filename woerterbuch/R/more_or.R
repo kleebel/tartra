@@ -58,7 +58,7 @@ moreor_term_search <- function(doc, conditions) {
     # Ueberpruefe jede OR-Gruppe innerhalb der AND-Bedingung
     for (or_group_name in names(condition$AND)) {
       or_terms <- condition$AND[[or_group_name]]
-      or_matches <- sapply(or_terms, function(word) stringr::str_detect_all(doc, word))
+      or_matches <- sapply(or_terms, function(word) stringr::str_extract_all(doc, word))
 
       if (any(or_matches)) {
         matched_words[[or_group_name]] <- or_terms[or_matches]
