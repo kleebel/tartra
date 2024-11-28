@@ -53,7 +53,7 @@ oneor_term_search <- function(doc, conditions) {
 
   # Ueberpruefe die OR-Bedingung
   or_terms <- conditions$OR
-  or_matches <- sapply(or_terms, function(word) stringr::str_extract_all(doc, word))
+  or_matches <- sapply(or_terms, function(word) stringr::str_detect(doc, word))
 
   # Sammle gefundene Begriffe
   if (any(or_matches)) {
