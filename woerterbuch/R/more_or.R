@@ -106,13 +106,8 @@ moreor_process_findings <- function(relevant_documents) {
   # 4. Umwandlung in breites Format und Entpacken von Listen
   result <- df %>%
     pivot_wider(names_from = "L1", values_from = "value") %>%
+    mutate(across(everything(), ~ if (is.list(.x)) { map(.x, ~ paste0(.x, collapse = ", ")) } else { .x })) %>%
     unnest(cols = c(starts_with("found_words_"), document, doc_id))
-
-  # 5. Zusammenfassen der Woerter pro Dokument
-  result <- result %>%
-    group_by(doc_id, document) %>%
-    summarize(across(starts_with("found_words_"), ~ paste0(.x, collapse = ", "))) %>%
-    ungroup()
 
   # Rueckgabe des formatierten DataFrames
   return(result)
