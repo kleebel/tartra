@@ -107,7 +107,8 @@ moreor_process_findings <- function(relevant_documents) {
   result <- df %>%
     pivot_wider(names_from = "L1", values_from = "value") %>%
     mutate(across(everything(), ~ if (is.list(.x)) { map(.x, ~ paste0(.x, collapse = ", ")) } else { .x })) %>%
-    unnest(cols = c(starts_with("found_words_"), document, doc_id))
+    unnest(cols = c(starts_with("found_words_"), document, doc_id)) %>%
+    select(-group)
 
   # Rueckgabe des formatierten DataFrames
   return(result)
