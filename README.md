@@ -37,7 +37,7 @@ Das Projekt setzt auf ein Mixed Methods Design aus **automatisierten** und **qua
 
 ### 📦 Inhalt dieses Repositories  
 
-Dieses Repository enthält (bisher) ein **R-Package** zur Wörterbuchanalyse.  
+Dieses Repository enthält (bisher) ein **R-Package** zur Wörterbuchanalyse [woerterbuch](https://github.com/kleebel/tartra/tree/main/woerterbuch).  
 
 #### Funktionen:  
 - **Effiziente Durchsuchung großer Textkorpora**:  
