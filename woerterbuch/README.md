@@ -1,10 +1,10 @@
 
-## woerterbuch Package
+# woerterbuch Package
 
 Dieses Package ermöglicht, große Textkorpora nach bestimmten Begriffen in UND/ODER Zusammenhängen effizient zu durchsuchen. Es nutzt parallele Verarbeitung, um die Leistung bei großen Datensätzen zu verbessern. Wir verwenden es, um Tarifvertragsdokumente nach Transformationsregelungen zu durchsuchen.
 
 
-### Installation
+## Installation
 Wie bei anderen Packages, musst du das R-Package zunächst installieren und dann laden.
 
 ```
@@ -13,7 +13,7 @@ install_github("kleebel/tartra/woerterbuch", upgrade = "never")
 library(woerterbuch)
 ```
 
-### Arbeitsweise
+## Arbeitsweise
 
 1. Daten & Korpus laden: deine Daten müssen als Liste von Dokumenten vorliegen. Lade deinen bereits existierenden Korpus, erstelle ihn oder wandle Texte aus einem Dataframe um.
 2. Bedingungen definieren: Definieren die Begriffe, nach denen gesucht werden soll, in einer Liste mit dem Schlüssel OR.
@@ -21,7 +21,7 @@ library(woerterbuch)
 4. Ergebnisse verarbeiten: Nutze `oneor_process_findings` oder `moreor_process_findings`, um die Ergebnisse in einem DataFrame für die Weiterverarbeitung oder Analyse zu formatieren.
 
 
-### Beispielhafter Workflow
+## Beispielhafter Workflow
 
 ```
 # weitere Packages laden
@@ -33,12 +33,12 @@ library(doParallel)
 
 # Beispiel-Korpus erstellen
 corpus <- list(
-  doc1 = "Die Qualifizierung in der Digitalisierung ist wichtig.",
-  doc2 = "Die Schulung zur Automatisierung ist der nächste Schritt.",
-  doc3 = "Eine gute Weiterbildung und Fortbildung sind wichtig für die Karriere."
+  doc1 = "die qualifizierung in der digitalisierung ist wichtig.",
+  doc2 = "die schulung zur automatisierung ist der nächste schritt.",
+  doc3 = "eine gute weiterbildung und fortbildung sind wichtig für die karriere."
 )
 
-# Suchbedingungen definieren
+# Beispiel-Suchbedingungen definieren
 more_conditions <- list(
   condition1 = list(
     AND = list(
@@ -50,7 +50,8 @@ more_conditions <- list(
     )
   )
 )
-# Suchkonstrukt besteht aus mehreren Oder-Gruppen (hier Qualifizierung und Digitalisierung). Daher werden im folgenden die Funktionen mit dem Präfix "moreor_" verwendet
+# Suchkonstrukt besteht aus mehreren Oder-Gruppen (hier Qualifizierung und Digitalisierung).
+# Daher werden im folgenden die Funktionen mit dem Präfix "moreor_" verwendet.
 
 # Suche ausführen
 found_documents_moreor <- moreor_apply_search(corpus, more_conditions)
