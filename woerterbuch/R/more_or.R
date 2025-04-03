@@ -5,37 +5,45 @@
 #'
 #' @import foreach
 #' @import doParallel
-#' @param corpus Ein Korpus von Dokumenten (Liste von Zeichenketten).
-#' @param conditions Eine Liste von Bedingungen.
+#' @param dataset Ein DataFrame mit den Seiteninformationen.
+#' @param conditions Eine Liste mit Suchbedingungen.
 #' @return Eine Liste der relevanten Dokumente mit den gefundenen Begriffen und Kontext.
 #' @export
-moreor_apply_search_with_context <- function(corpus, conditions) {
+moreor_apply_contextual_search <- function(dataset, conditions) {
   # Erstelle einen Parallel-Cluster
-  cl <- makeCluster(detectCores() - 1)
+  cl <- makeCluster(detectCores())
+  clusterExport(cl, varlist = c("moreor_term_search"))
   registerDoParallel(cl)
 
-  # Parallele Verarbeitung der Dokumente
-  relevant_documents <- foreach(
-    doc_id = seq_along(corpus), .combine = "c", .packages = c("stringr", "foreach", "doParallel")
+  # Liste für relevante Ergebnisse
+  relevant_pages <- foreach(
+    page_id = seq_len(nrow(dataset)), .combine = "rbind", .packages = c("stringr", "dplyr")
   ) %dopar% {
-    current_page <- corpus[[doc_id]]
+    # Extrahiere aktuelle Seite und realfilename
+    current_page <- dataset[page_id, ]
+    current_filename <- current_page$realfilename
 
-    # Kontext: vorherige und folgende Seite einbeziehen
-    context <- paste(
-      if (doc_id > 1) corpus[[doc_id - 1]] else "",
-      current_page,
-      if (doc_id < length(corpus)) corpus[[doc_id + 1]] else "",
-      sep = "\n\n"
+    # Bestimme vorherige und nächste Seite nur, wenn sie denselben realfilename haben
+    prev_page <- if (page_id > 1 && dataset[page_id - 1, "realfilename"] == current_filename) dataset[page_id - 1, ] else NULL
+    next_page <- if (page_id < nrow(dataset) && dataset[page_id + 1, "realfilename"] == current_filename) dataset[page_id + 1, ] else NULL
+
+    # Kombiniere Text der Kontextseiten nur bei gleichem realfilename
+    context_text <- paste(
+      if (!is.null(prev_page)) prev_page$text else "",
+      current_page$text,
+      if (!is.null(next_page)) next_page$text else "",
+      sep = " "
     )
 
-    found_words <- moreor_term_search(context, conditions)
+    # Suche nach Bedingungen im kombinierten Text
+    found_words <- moreor_term_search(context_text, conditions)
 
-    # Wenn relevante Begriffe gefunden wurden, speichere sie mit Kontext
+    # Wenn relevante Begriffe gefunden wurden, speichere sie
     if (length(found_words) > 0) {
-      return(list(
-        doc_id = doc_id,
-        context = context,
-        found_words = found_words
+      return(data.frame(
+        page = current_page$page,
+        realfilename = current_filename,
+        found_words = I(list(found_words))
       ))
     } else {
       return(NULL)
@@ -45,10 +53,10 @@ moreor_apply_search_with_context <- function(corpus, conditions) {
   # Stoppe den Parallel-Cluster
   stopCluster(cl)
 
-  # Entferne NULL-Werte (Dokumente ohne gefundene Begriffe)
-  relevant_documents <- relevant_documents[!sapply(relevant_documents, is.null)]
+  # Entferne NULL-Werte
+  relevant_pages <- relevant_pages[!sapply(relevant_pages, is.null), ]
 
-  return(relevant_documents)
+  return(relevant_pages)
 }
 
 
