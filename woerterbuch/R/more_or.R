@@ -1,4 +1,57 @@
 
+#' Search multiple OR-Groups Across Multiple Documents with Context (Parallel)
+#'
+#' Diese Funktion durchsucht mehrere Dokumente parallel nach Begriffen und berücksichtigt dabei den Kontext (eine Seite davor und danach).
+#'
+#' @import foreach
+#' @import doParallel
+#' @param corpus Ein Korpus von Dokumenten (Liste von Zeichenketten).
+#' @param conditions Eine Liste von Bedingungen.
+#' @return Eine Liste der relevanten Dokumente mit den gefundenen Begriffen und Kontext.
+#' @export
+moreor_apply_search_with_context <- function(corpus, conditions) {
+  # Erstelle einen Parallel-Cluster
+  cl <- makeCluster(detectCores() - 1)
+  registerDoParallel(cl)
+
+  # Parallele Verarbeitung der Dokumente
+  relevant_documents <- foreach(
+    doc_id = seq_along(corpus), .combine = "c", .packages = c("stringr", "foreach", "doParallel")
+  ) %dopar% {
+    current_page <- corpus[[doc_id]]
+
+    # Kontext: vorherige und folgende Seite einbeziehen
+    context <- paste(
+      if (doc_id > 1) corpus[[doc_id - 1]] else "",
+      current_page,
+      if (doc_id < length(corpus)) corpus[[doc_id + 1]] else "",
+      sep = "\n\n"
+    )
+
+    found_words <- moreor_term_search(context, conditions)
+
+    # Wenn relevante Begriffe gefunden wurden, speichere sie mit Kontext
+    if (length(found_words) > 0) {
+      return(list(
+        doc_id = doc_id,
+        context = context,
+        found_words = found_words
+      ))
+    } else {
+      return(NULL)
+    }
+  }
+
+  # Stoppe den Parallel-Cluster
+  stopCluster(cl)
+
+  # Entferne NULL-Werte (Dokumente ohne gefundene Begriffe)
+  relevant_documents <- relevant_documents[!sapply(relevant_documents, is.null)]
+
+  return(relevant_documents)
+}
+
+
 #' Search multiple OR-Groups Across Multiple Documents (Parallel)
 #'
 #' Diese Funktion durchsucht mehrere Dokumente parallel nach Begriffen gemaess den Bedingungen.
