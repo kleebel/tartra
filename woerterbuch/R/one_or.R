@@ -1,3 +1,59 @@
+#' Search one OR-Term with Optional Context Across Multiple Documents (Parallel)
+#'
+#' Diese Funktion durchsucht mehrere Dokumente parallel nach Begriffen gemaess einer einzelnen OR-Bedingung
+#' und bezieht optional den Kontext (eine Seite davor und danach) ein, sofern vorhanden.
+#'
+#' @import foreach
+#' @import doParallel
+#' @param dataset Ein DataFrame mit den Seiteninformationen (inkl. text, page, realfilename).
+#' @param conditions Eine Bedingung (Liste) mit einer einzigen OR-Gruppe.
+#' @param with_context TRUE, wenn Kontextseiten (vorher/nachher) berücksichtigt werden sollen.
+#' @return Ein DataFrame mit den relevanten Seiten, realfilename und einer Listenspalte gefundener Begriffe.
+#' @export
+oneor_apply_contextual_search <- function(dataset, conditions, with_context = TRUE) {
+  cl <- makeCluster(detectCores())
+  registerDoParallel(cl)
+
+  relevant_pages <- foreach(
+    page_id = seq_len(nrow(dataset)), .combine = "rbind", .packages = c("stringr", "dplyr")
+  ) %dopar% {
+    current_page <- dataset[page_id, ]
+    current_filename <- current_page$realfilename
+
+    # Wähle zu durchsuchenden Text abhängig vom Kontext-Parameter
+    if (with_context) {
+      prev_page <- if (page_id > 1 && dataset[page_id - 1, "realfilename"] == current_filename) dataset[page_id - 1, ] else NULL
+      next_page <- if (page_id < nrow(dataset) && dataset[page_id + 1, "realfilename"] == current_filename) dataset[page_id + 1, ] else NULL
+
+      search_text <- paste(
+        if (!is.null(prev_page)) prev_page$text else "",
+        current_page$text,
+        if (!is.null(next_page)) next_page$text else "",
+        sep = " "
+      )
+    } else {
+      search_text <- current_page$text
+    }
+
+    found_words <- oneor_term_search(search_text, conditions)
+
+    if (length(found_words) > 0) {
+      return(data.frame(
+        page = current_page$page,
+        realfilename = current_filename,
+        found_words = I(list(found_words))
+      ))
+    } else {
+      return(NULL)
+    }
+  }
+
+  stopCluster(cl)
+  relevant_pages <- relevant_pages[!sapply(relevant_pages, is.null), ]
+
+  return(relevant_pages)
+}
+
 
 #' Search one OR-Term Across Multiple Documents (Parallel)
 #'
