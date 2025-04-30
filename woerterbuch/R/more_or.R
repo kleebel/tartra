@@ -10,35 +10,25 @@
 #' @return Eine Liste der relevanten Dokumente mit den gefundenen Begriffen und Kontext.
 #' @export
 moreor_apply_contextual_search <- function(dataset, conditions) {
-  # Erstelle einen Parallel-Cluster
   cl <- makeCluster(detectCores())
   clusterExport(cl, varlist = c("moreor_term_search"))
   registerDoParallel(cl)
 
-  # Liste für relevante Ergebnisse
   relevant_pages <- foreach(
     page_id = seq_len(nrow(dataset)), .combine = "rbind", .packages = c("stringr", "dplyr")
   ) %dopar% {
-    # Extrahiere aktuelle Seite und realfilename
     current_page <- dataset[page_id, ]
     current_filename <- current_page$realfilename
 
-    # Bestimme vorherige und nächste Seite nur, wenn sie denselben realfilename haben
-    prev_page <- if (page_id > 1 && dataset[page_id - 1, "realfilename"] == current_filename) dataset[page_id - 1, ] else NULL
-    next_page <- if (page_id < nrow(dataset) && dataset[page_id + 1, "realfilename"] == current_filename) dataset[page_id + 1, ] else NULL
+    if (page_id < nrow(dataset) && dataset[page_id + 1, "realfilename"] == current_filename) {
+      next_page <- dataset[page_id + 1, ]
+      context_text <- paste(current_page$text, next_page$text, sep = " ")
+    } else {
+      context_text <- current_page$text
+    }
 
-    # Kombiniere Text der Kontextseiten nur bei gleichem realfilename
-    context_text <- paste(
-      if (!is.null(prev_page)) prev_page$text else "",
-      current_page$text,
-      if (!is.null(next_page)) next_page$text else "",
-      sep = " "
-    )
-
-    # Suche nach Bedingungen im kombinierten Text
     found_words <- moreor_term_search(context_text, conditions)
 
-    # Wenn relevante Begriffe gefunden wurden, speichere sie
     if (length(found_words) > 0) {
       return(data.frame(
         page = current_page$page,
@@ -50,12 +40,8 @@ moreor_apply_contextual_search <- function(dataset, conditions) {
     }
   }
 
-  # Stoppe den Parallel-Cluster
   stopCluster(cl)
-
-  # Entferne NULL-Werte
   relevant_pages <- relevant_pages[!sapply(relevant_pages, is.null), ]
-
   return(relevant_pages)
 }
 
