@@ -7,13 +7,14 @@
 moreor_apply_contextual_search(dataset, conditions)
 }
 \arguments{
-\item{dataset}{Ein DataFrame mit den Seiteninformationen.}
+\item{dataset}{Ein DataFrame mit den Seiteninformationen. Muss mindestens \code{text}, \code{page} und \code{realfilename} enthalten.}
 
-\item{conditions}{Eine Liste mit Suchbedingungen.}
+\item{conditions}{Eine Liste mit Suchbedingungen nach dem Muster \code{list(condition1 = list(AND = list(OR1 = ..., OR2 = ...)))}.}
 }
 \value{
-Eine Liste der relevanten Dokumente mit den gefundenen Begriffen und Kontext.
+Ein DataFrame mit Treffern, Seitenangaben und gefundenen Begriffen je OR-Gruppe.
 }
 \description{
-Diese Funktion durchsucht mehrere Dokumente parallel nach Begriffen und berücksichtigt dabei den Kontext (eine Seite davor und danach).
+Diese Funktion durchsucht mehrere Dokumente nach Begriffen aus mehreren OR-Gruppen und berücksichtigt dabei den Kontext (eine Seite danach),
+sofern nur eine OR-Gruppe auf der aktuellen Seite zutrifft. Seiten müssen eine Spalte \code{page} und \code{realfilename} enthalten.
 }

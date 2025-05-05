@@ -1,48 +1,86 @@
 
 #' Search multiple OR-Groups Across Multiple Documents with Context (Parallel)
 #'
-#' Diese Funktion durchsucht mehrere Dokumente parallel nach Begriffen und berücksichtigt dabei den Kontext (eine Seite davor und danach).
+#' Diese Funktion durchsucht mehrere Dokumente nach Begriffen aus mehreren OR-Gruppen und berücksichtigt dabei den Kontext (eine Seite danach),
+#' sofern nur eine OR-Gruppe auf der aktuellen Seite zutrifft. Seiten müssen eine Spalte \code{page} und \code{realfilename} enthalten.
 #'
-#' @import foreach
-#' @import doParallel
-#' @param dataset Ein DataFrame mit den Seiteninformationen.
-#' @param conditions Eine Liste mit Suchbedingungen.
-#' @return Eine Liste der relevanten Dokumente mit den gefundenen Begriffen und Kontext.
+#' @param dataset Ein DataFrame mit den Seiteninformationen. Muss mindestens \code{text}, \code{page} und \code{realfilename} enthalten.
+#' @param conditions Eine Liste mit Suchbedingungen nach dem Muster \code{list(condition1 = list(AND = list(OR1 = ..., OR2 = ...)))}.
+#'
+#' @return Ein DataFrame mit Treffern, Seitenangaben und gefundenen Begriffen je OR-Gruppe.
 #' @export
+#'
+#' @import dplyr
+#' @import stringr
+#' @importFrom tibble tibble
 moreor_apply_contextual_search <- function(dataset, conditions) {
-  cl <- makeCluster(detectCores())
-  clusterExport(cl, varlist = c("moreor_term_search"))
-  registerDoParallel(cl)
-
-  relevant_pages <- foreach(
-    page_id = seq_len(nrow(dataset)), .combine = "rbind", .packages = c("stringr", "dplyr")
-  ) %dopar% {
-    current_page <- dataset[page_id, ]
-    current_filename <- current_page$realfilename
-
-    if (page_id < nrow(dataset) && dataset[page_id + 1, "realfilename"] == current_filename) {
-      next_page <- dataset[page_id + 1, ]
-      context_text <- paste(current_page$text, next_page$text, sep = " ")
-    } else {
-      context_text <- current_page$text
-    }
-
-    found_words <- moreor_term_search(context_text, conditions)
-
-    if (length(found_words) > 0) {
-      return(data.frame(
-        page = current_page$page,
-        realfilename = current_filename,
-        found_words = I(list(found_words))
-      ))
-    } else {
-      return(NULL)
-    }
+  # Hilfsfunktion zum Pattern-Match
+  match_or_group <- function(patterns, text) {
+    matches <- sapply(patterns, function(p) grepl(p, text, ignore.case = TRUE, perl = TRUE))
+    names(matches) <- patterns
+    return(matches)
   }
 
-  stopCluster(cl)
-  relevant_pages <- relevant_pages[!sapply(relevant_pages, is.null), ]
-  return(relevant_pages)
+  or1_patterns <- conditions$condition1$AND$OR1
+  or2_patterns <- conditions$condition1$AND$OR2
+
+  results <- list()
+  i <- 1
+
+  while (i <= nrow(dataset)) {
+    page1 <- dataset[i, ]
+    text1 <- page1$text
+
+    or1_match <- match_or_group(or1_patterns, text1)
+    or2_match <- match_or_group(or2_patterns, text1)
+
+    or1_hit <- any(or1_match)
+    or2_hit <- any(or2_match)
+
+    if (or1_hit && or2_hit) {
+      results[[length(results) + 1]] <- tibble(
+        realfilename = page1$realfilename,
+        pages = as.character(page1$page),
+        found_words_OR1 = paste(names(or1_match)[or1_match], collapse = ", "),
+        found_words_OR2 = paste(names(or2_match)[or2_match], collapse = ", ")
+      )
+      i <- i + 1
+      next
+    }
+
+    if ((or1_hit || or2_hit) && i < nrow(dataset)) {
+      page2 <- dataset[i + 1, ]
+      if (page1$realfilename == page2$realfilename) {
+        combined_text <- paste(text1, page2$text, sep = " ")
+        or1_combined <- match_or_group(or1_patterns, combined_text)
+        or2_combined <- match_or_group(or2_patterns, combined_text)
+
+        if (any(or1_combined) && any(or2_combined)) {
+          results[[length(results) + 1]] <- tibble(
+            realfilename = page1$realfilename,
+            pages = paste(page1$page, page2$page, sep = ","),
+            found_words_OR1 = paste(names(or1_combined)[or1_combined], collapse = ", "),
+            found_words_OR2 = paste(names(or2_combined)[or2_combined], collapse = ", ")
+          )
+          i <- i + 2
+          next
+        }
+      }
+    }
+
+    i <- i + 1
+  }
+
+  if (length(results) > 0) {
+    return(bind_rows(results))
+  } else {
+    return(tibble(
+      realfilename = character(),
+      pages = character(),
+      found_words_OR1 = character(),
+      found_words_OR2 = character()
+    ))
+  }
 }
 
 
